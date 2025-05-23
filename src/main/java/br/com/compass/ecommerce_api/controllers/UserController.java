@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.compass.ecommerce_api.dtos.UserPasswordDto;
+import br.com.compass.ecommerce_api.dtos.UserResponseDto;
+import br.com.compass.ecommerce_api.dtos.UserSaveDto;
+import br.com.compass.ecommerce_api.dtos.mappers.UserMapper;
 import br.com.compass.ecommerce_api.entities.User;
 import br.com.compass.ecommerce_api.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,26 +28,26 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody User user) {
-        User newUser = userService.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+    public ResponseEntity<UserResponseDto> save(@RequestBody UserSaveDto dto) {
+        User newUser = userService.save(UserMapper.toUser(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(newUser));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> findById(@PathVariable Long id) {
         User user = userService.findById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> updatePassword(@PathVariable Long id, @RequestBody User user) {
-        User updatedUser = userService.updatePassword(id, user.getPassword());
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UserPasswordDto dto) {
+        userService.updatePassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmedPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> findAll() {
+    public ResponseEntity<List<UserResponseDto>> findAll() {
         List<User> users = userService.findAll();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(UserMapper.toListDto(users));
     }
 }
