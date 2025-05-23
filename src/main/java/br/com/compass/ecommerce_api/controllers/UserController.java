@@ -18,6 +18,7 @@ import br.com.compass.ecommerce_api.dtos.UserSaveDto;
 import br.com.compass.ecommerce_api.dtos.mappers.UserMapper;
 import br.com.compass.ecommerce_api.entities.User;
 import br.com.compass.ecommerce_api.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDto> save(@RequestBody UserSaveDto dto) {
+    public ResponseEntity<UserResponseDto> save(@Valid @RequestBody UserSaveDto dto) {
         User newUser = userService.save(UserMapper.toUser(dto));
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(newUser));
     }
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UserPasswordDto dto) {
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto dto) {
         userService.updatePassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmedPassword());
         return ResponseEntity.noContent().build();
     }
