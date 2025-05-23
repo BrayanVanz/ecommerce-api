@@ -17,7 +17,10 @@ public class SpringSecurityConfig {
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "api/v1/users").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/users/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/users/*").permitAll()
                 .anyRequest().authenticated()
             ).sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
