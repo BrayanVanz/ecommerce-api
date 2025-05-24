@@ -1,7 +1,5 @@
 package br.com.compass.ecommerce_api;
 
-import java.util.List;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import br.com.compass.ecommerce_api.dtos.PageableDto;
 import br.com.compass.ecommerce_api.dtos.UserPasswordDto;
 import br.com.compass.ecommerce_api.dtos.UserResponseDto;
 import br.com.compass.ecommerce_api.dtos.UserSaveDto;
@@ -364,22 +363,39 @@ public class UserTest {
     }
 
     @Test
-    public void findAll_AuthorizedAccess_ReturnUsersListStatus200() {
-        List<UserResponseDto> responseBody = webTestClient
+    @SuppressWarnings("rawtypes")
+    public void findAll_PaginationAdmin_ReturnClientsStatus200() {
+        PageableDto responseBody = webTestClient
             .get()
             .uri("/api/v1/users")
             .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "yugi@gmail.com", "123456"))
             .exchange()
             .expectStatus().isOk()
-            .expectBodyList(UserResponseDto.class)
+            .expectBody(PageableDto.class)
             .returnResult().getResponseBody();
-        
+
         Assertions.assertThat(responseBody).isNotNull();
-        Assertions.assertThat(responseBody.size()).isEqualTo(3);
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(3);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(1);
+
+        responseBody = webTestClient
+            .get()
+            .uri("/api/v1/users?size=1&page=1")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "yugi@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(PageableDto.class)
+            .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(3);
     }
 
     @Test
-    public void findAll_UnauthorizedAccess_ReturnErrorMessageStatus403() {
+    public void findAll_PaginationClient_ReturnErrorMessage403() {
         ErrorMessage responseBody = webTestClient
             .get()
             .uri("/api/v1/users")
@@ -388,7 +404,7 @@ public class UserTest {
             .expectStatus().isForbidden()
             .expectBody(ErrorMessage.class)
             .returnResult().getResponseBody();
-        
+
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
