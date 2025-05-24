@@ -1,8 +1,8 @@
 package br.com.compass.ecommerce_api.services;
 
-import java.util.List;
-
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +12,7 @@ import br.com.compass.ecommerce_api.enums.UserRole;
 import br.com.compass.ecommerce_api.exceptions.EmailUniqueViolationException;
 import br.com.compass.ecommerce_api.exceptions.EntityNotFoundException;
 import br.com.compass.ecommerce_api.exceptions.PasswordInvalidException;
+import br.com.compass.ecommerce_api.projections.UserProjection;
 import br.com.compass.ecommerce_api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -56,8 +57,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public Page<UserProjection> findAll(Pageable pageable) {
+        return userRepository.findAllPageable(pageable);
     }
 
     @Transactional(readOnly = true)

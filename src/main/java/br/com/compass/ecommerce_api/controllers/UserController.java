@@ -1,7 +1,8 @@
 package br.com.compass.ecommerce_api.controllers;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,12 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.compass.ecommerce_api.dtos.PageableDto;
 import br.com.compass.ecommerce_api.dtos.UserPasswordDto;
 import br.com.compass.ecommerce_api.dtos.UserResponseDto;
 import br.com.compass.ecommerce_api.dtos.UserSaveDto;
+import br.com.compass.ecommerce_api.dtos.mappers.PageableMapper;
 import br.com.compass.ecommerce_api.dtos.mappers.UserMapper;
 import br.com.compass.ecommerce_api.entities.User;
 import br.com.compass.ecommerce_api.enums.UserRole;
+import br.com.compass.ecommerce_api.projections.UserProjection;
 import br.com.compass.ecommerce_api.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,8 +65,8 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<UserResponseDto>> findAll() {
-        List<User> users = userService.findAll();
-        return ResponseEntity.ok(UserMapper.toListDto(users));
+    public ResponseEntity<PageableDto<UserProjection>> findAll(@PageableDefault(size = 3) Pageable pageable) {
+        Page<UserProjection> users = userService.findAll(pageable);
+        return ResponseEntity.ok(PageableMapper.toDto(users));
     }
 }
