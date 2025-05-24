@@ -18,6 +18,7 @@ import br.com.compass.ecommerce_api.dtos.UserResponseDto;
 import br.com.compass.ecommerce_api.dtos.UserSaveDto;
 import br.com.compass.ecommerce_api.dtos.mappers.UserMapper;
 import br.com.compass.ecommerce_api.entities.User;
+import br.com.compass.ecommerce_api.enums.UserRole;
 import br.com.compass.ecommerce_api.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,15 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDto> save(@Valid @RequestBody UserSaveDto dto) {
         User newUser = userService.save(UserMapper.toUser(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(newUser));
+    }
+
+    @PostMapping("/admin")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UserResponseDto> saveAdmin(@Valid @RequestBody UserSaveDto dto) {
+        User newUser = UserMapper.toUser(dto);
+        newUser.setRole(UserRole.ADMIN);
+        userService.save(newUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(newUser));
     }
 
