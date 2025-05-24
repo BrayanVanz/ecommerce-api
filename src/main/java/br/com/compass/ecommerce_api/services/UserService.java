@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.compass.ecommerce_api.entities.User;
+import br.com.compass.ecommerce_api.enums.UserRole;
 import br.com.compass.ecommerce_api.exceptions.EmailUniqueViolationException;
 import br.com.compass.ecommerce_api.exceptions.EntityNotFoundException;
 import br.com.compass.ecommerce_api.exceptions.PasswordInvalidException;
@@ -57,5 +58,17 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(
+            () -> new EntityNotFoundException(String.format("User {%s} not found", email))
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public UserRole findRoleByEmail(String email) {
+        return userRepository.findRoleByEmail(email);
     }
 }
