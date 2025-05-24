@@ -1,0 +1,3 @@
+INSERT INTO users (name, email, password, role) VALUES ('Yugi Muto', 'yugi@gmail.com', '$2a$10$DybF0RwnLnlGzmTajn1zWOuEKfsd6V00HQHT7wZMFsozIkL9zK4Ve', 'ADMIN');
+INSERT INTO users (name, email, password, role) VALUES ('Joey Wheeler', 'joey@gmail.com', '$2a$10$DybF0RwnLnlGzmTajn1zWOuEKfsd6V00HQHT7wZMFsozIkL9zK4Ve', 'CLIENT');
+INSERT INTO users (name, email, password, role) VALUES ('Tea Gardner', 'tea@gmail.com', '$2a$10$DybF0RwnLnlGzmTajn1zWOuEKfsd6V00HQHT7wZMFsozIkL9zK4Ve', 'CLIENT');
