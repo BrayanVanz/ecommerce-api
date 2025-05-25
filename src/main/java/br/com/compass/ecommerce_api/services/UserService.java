@@ -1,5 +1,8 @@
 package br.com.compass.ecommerce_api.services;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,11 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.compass.ecommerce_api.entities.PasswordResetToken;
 import br.com.compass.ecommerce_api.entities.User;
 import br.com.compass.ecommerce_api.enums.UserRole;
 import br.com.compass.ecommerce_api.exceptions.EmailUniqueViolationException;
 import br.com.compass.ecommerce_api.exceptions.EntityNotFoundException;
 import br.com.compass.ecommerce_api.exceptions.PasswordInvalidException;
+import br.com.compass.ecommerce_api.exceptions.ResetTokenInvalidException;
 import br.com.compass.ecommerce_api.projections.UserProjection;
 import br.com.compass.ecommerce_api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +27,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final PasswordTokenService tokenService;
 
     @Transactional
     public User save(User user) {
@@ -41,19 +48,39 @@ public class UserService {
     }
 
     @Transactional
-    public User updatePassword(Long id, String currentPassword, String newPassword, String confirmedPassword) {
+    public void initiatePasswordReset(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+            () -> new EntityNotFoundException(String.format("User {%s} not found", email))
+        );
+
+        String token = UUID.randomUUID().toString();
+
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+            .token(token)
+            .user(user)
+            .expiryDate(LocalDateTime.now().plusMinutes(5))
+            .build();
+        tokenService.save(resetToken);
+        
+        String resetLink = String.format("localhost:8080/password-reset/confirm?token=%s", token);
+        emailService.sendEmail(email, resetLink);
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword, String confirmedPassword) {
         if (!newPassword.equals(confirmedPassword)) {
             throw new PasswordInvalidException("New password must be equal to the confirmed password");
         }
 
-        User user = findById(id);
-
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new PasswordInvalidException("Wrong password");
+        PasswordResetToken resetToken = tokenService.findByToken(token);
+        if (resetToken.isUsed() || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResetTokenInvalidException("Token expired or already used");
         }
 
+        User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
-        return user;
+
+        resetToken.setUsed(true);
     }
 
     @Transactional(readOnly = true)

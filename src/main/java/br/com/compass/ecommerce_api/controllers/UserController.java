@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.compass.ecommerce_api.dtos.PageableDto;
-import br.com.compass.ecommerce_api.dtos.UserPasswordDto;
+import br.com.compass.ecommerce_api.dtos.PasswordResetDto;
+import br.com.compass.ecommerce_api.dtos.UserEmailDto;
 import br.com.compass.ecommerce_api.dtos.UserResponseDto;
 import br.com.compass.ecommerce_api.dtos.UserSaveDto;
 import br.com.compass.ecommerce_api.dtos.mappers.PageableMapper;
@@ -56,10 +58,20 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
-    @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT') AND (#id == authentication.principal.id)")
-    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto dto) {
-        userService.updatePassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmedPassword());
+    @PostMapping("/password-reset/request")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    public ResponseEntity<Void> requestPasswordReset(@RequestBody @Valid UserEmailDto dto) {
+        userService.initiatePasswordReset(dto.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/password-reset/confirm")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    public ResponseEntity<Void> confirmPasswordReset(
+        @RequestParam String token,
+        @Valid @RequestBody PasswordResetDto dto) {
+
+        userService.resetPassword(token, dto.getNewPassword(), dto.getConfirmedPassword());
         return ResponseEntity.noContent().build();
     }
 
