@@ -43,7 +43,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(
-            () -> new EntityNotFoundException(String.format("User {%d} found", id))
+            () -> new EntityNotFoundException(String.format("User {%d} not found", id))
         );
     }
 

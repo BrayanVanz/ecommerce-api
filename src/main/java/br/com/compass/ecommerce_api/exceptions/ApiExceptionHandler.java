@@ -28,7 +28,9 @@ public class ApiExceptionHandler {
             .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Invalid Fields", result));
     }
 
-    @ExceptionHandler(EmailUniqueViolationException.class)
+    @ExceptionHandler({ 
+        EmailUniqueViolationException.class, ProductUniqueViolationException.class, ProductDeletionNotAllowedException.class 
+    })
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException ex,
         HttpServletRequest request) {
 
@@ -52,7 +54,7 @@ public class ApiExceptionHandler {
             .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
-    @ExceptionHandler({PasswordInvalidException.class, ResetTokenInvalidException.class})
+    @ExceptionHandler({ PasswordInvalidException.class, ResetTokenInvalidException.class })
     public ResponseEntity<ErrorMessage> passwordInvalidException(RuntimeException ex,
         HttpServletRequest request) {
 

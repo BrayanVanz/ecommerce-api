@@ -59,7 +59,7 @@ public class UserController {
     }
 
     @PostMapping("/password-reset/request")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT') AND #dto.email == authentication.principal.username")
     public ResponseEntity<Void> requestPasswordReset(@RequestBody @Valid UserEmailDto dto) {
         userService.initiatePasswordReset(dto.getEmail());
         return ResponseEntity.ok().build();
