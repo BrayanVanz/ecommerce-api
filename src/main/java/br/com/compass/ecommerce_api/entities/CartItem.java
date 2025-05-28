@@ -2,25 +2,21 @@ package br.com.compass.ecommerce_api.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import br.com.compass.ecommerce_api.enums.UserRole;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,27 +26,27 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "users")
 @Entity
+@Table(name = "cart_items", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "product_id"})
+})
 @EntityListeners(AuditingEntityListener.class)
-public class User implements Serializable {
+public class CartItem implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-    @Column(nullable = false, length = 200)
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 6)
-    private UserRole role = UserRole.CLIENT;
+    @Column(nullable = false)
+    private Integer quantity;
 
     @CreatedDate
     @Column(name = "creation_date")
@@ -59,9 +55,6 @@ public class User implements Serializable {
     @LastModifiedDate
     @Column(name = "modification_date")
     private LocalDateTime modificationDate;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> cart = new ArrayList<>();
 
     @Override
     public int hashCode() {
@@ -79,7 +72,7 @@ public class User implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        User other = (User) obj;
+        CartItem other = (CartItem) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
