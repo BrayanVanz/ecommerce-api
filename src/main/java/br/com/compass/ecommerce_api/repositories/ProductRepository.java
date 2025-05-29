@@ -10,6 +10,9 @@ import br.com.compass.ecommerce_api.projections.ProductProjection;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    @Query("SELECT p FROM Product p ORDER BY p.timesPurchased DESC")
+    Page<ProductProjection> findBestSelling(Pageable pageable);
+
     @Query("SELECT p FROM Product p")
     Page<ProductProjection> findAllPageable(Pageable pageable);
 }

@@ -77,6 +77,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public Page<ProductProjection> findBestSelling(Pageable pageable) {
+        return productRepository.findBestSelling(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<ProductProjection> findAll(Pageable pageable) {
         return productRepository.findAllPageable(pageable);
     }

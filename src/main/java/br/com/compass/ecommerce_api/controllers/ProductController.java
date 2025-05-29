@@ -85,6 +85,13 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/best-selling")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<PageableDto<ProductProjection>> findBestSelling(@PageableDefault(size = 3) Pageable pageable) {
+        Page<ProductProjection> products = productService.findBestSelling(pageable);
+        return ResponseEntity.ok(PageableMapper.toDto(products));
+    }
+
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PageableDto<ProductProjection>> findAll(@PageableDefault(size = 3) Pageable pageable) {

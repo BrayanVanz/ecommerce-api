@@ -30,7 +30,8 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler({ 
         EmailUniqueViolationException.class, ProductUniqueViolationException.class, 
-        ProductDeletionNotAllowedException.class, InsufficientStockException.class 
+        ProductDeletionNotAllowedException.class, InsufficientStockException.class,
+        CartEmptyException.class 
     })
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException ex,
         HttpServletRequest request) {
@@ -55,7 +56,8 @@ public class ApiExceptionHandler {
             .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
-    @ExceptionHandler({ PasswordInvalidException.class, ResetTokenInvalidException.class })
+    @ExceptionHandler({ PasswordInvalidException.class, ResetTokenInvalidException.class, 
+        PurchasePeriodInvalidException.class})
     public ResponseEntity<ErrorMessage> passwordInvalidException(RuntimeException ex,
         HttpServletRequest request) {
 

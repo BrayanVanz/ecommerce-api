@@ -64,6 +64,12 @@ public class StockController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/low-stock")
+    public ResponseEntity<PageableDto<StockProjection>> findLowStock(@PageableDefault(size = 3) Pageable pageable) {
+        Page<StockProjection> lowStockItems = stockService.findLowStock(pageable);
+        return ResponseEntity.ok(PageableMapper.toDto(lowStockItems));
+    }
+
     @GetMapping
     public ResponseEntity<PageableDto<StockProjection>> findAll(@PageableDefault(size = 3) Pageable pageable) {
         Page<StockProjection> stocks = stockService.findAll(pageable);

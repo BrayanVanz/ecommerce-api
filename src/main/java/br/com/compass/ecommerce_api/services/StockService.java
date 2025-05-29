@@ -42,6 +42,13 @@ public class StockService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Stock findByProductId(Long productId) {
+        return stockRepository.findByProductId(productId).orElseThrow(
+            () -> new EntityNotFoundException(String.format("Entry with productId {%d} not found in stock", productId))
+        );
+    }
+
     @Transactional
     public void add(Long id, Integer quantity) {
         Stock stock = findById(id);
@@ -57,6 +64,11 @@ public class StockService {
         }
 
         stock.setQuantity(stock.getQuantity() - quantity);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<StockProjection> findLowStock(Pageable pageable) {
+        return stockRepository.findLowStock(pageable);
     }
 
     @Transactional(readOnly = true)

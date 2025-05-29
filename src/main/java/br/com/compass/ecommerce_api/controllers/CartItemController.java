@@ -38,7 +38,7 @@ public class CartItemController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') OR ( hasAuthority('CLIENT') AND #id == authentication.principal.id )")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT') AND #dto.email == authentication.principal.username")
     public ResponseEntity<PageableDto<CartItemProjection>> findAll(@PathVariable Long id, @PageableDefault(size = 3) Pageable pageable) {
         Page<CartItemProjection> cart = cartItemService.getCart(id, pageable);
         return ResponseEntity.ok(PageableMapper.toDto(cart));
