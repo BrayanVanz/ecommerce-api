@@ -9,7 +9,9 @@ import br.com.compass.ecommerce_api.entities.Stock;
 public class StockMapper {
 
     public static Stock toStock(StockSaveDto dto) {
-        return new ModelMapper().map(dto, Stock.class);
+        Stock stock = new Stock();
+        stock.setQuantity(dto.getQuantity());
+        return stock;
     }
 
     public static StockResponseDto tDto(Stock stock) {

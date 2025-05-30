@@ -31,7 +31,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler({ 
         EmailUniqueViolationException.class, ProductUniqueViolationException.class, 
         ProductDeletionNotAllowedException.class, InsufficientStockException.class,
-        CartEmptyException.class 
+        CartEmptyException.class, ProductInactiveException.class
     })
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException ex,
         HttpServletRequest request) {

@@ -1,5 +1,6 @@
 package br.com.compass.ecommerce_api.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +13,8 @@ import br.com.compass.ecommerce_api.projections.CartItemProjection;
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     Page<CartItemProjection> findByUserId(Long userId, Pageable pageable);
+
+    List<CartItem> findByUserId(Long userId);
 
     Optional<CartItem> findByUserIdAndProductId(Long userId, Long productId);
 

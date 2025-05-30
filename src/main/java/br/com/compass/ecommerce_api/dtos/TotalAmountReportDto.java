@@ -2,8 +2,6 @@ package br.com.compass.ecommerce_api.dtos;
 
 import java.math.BigDecimal;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +13,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ProductAmountUpdateDto {
+public class TotalAmountReportDto {
 
-    @NotNull
-    @Positive(message = "Amount must be a positive number")
-    private BigDecimal amount;
+    private String period;
+    private BigDecimal totalAmount;
 }

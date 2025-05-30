@@ -33,12 +33,12 @@ public class CartItemController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
     public ResponseEntity<Void> addToCart(@Valid @RequestBody CartItemSaveDto dto) {
         CartItem cartItem = CartItemMapper.toCart(dto);
-        cartItemService.addToCart(cartItem);
+        cartItemService.addToCart(cartItem, dto.getUserId(), dto.getProductId());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT') AND #dto.email == authentication.principal.username")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT') AND #id == authentication.principal.id")
     public ResponseEntity<PageableDto<CartItemProjection>> findAll(@PathVariable Long id, @PageableDefault(size = 3) Pageable pageable) {
         Page<CartItemProjection> cart = cartItemService.getCart(id, pageable);
         return ResponseEntity.ok(PageableMapper.toDto(cart));

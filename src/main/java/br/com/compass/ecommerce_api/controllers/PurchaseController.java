@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.compass.ecommerce_api.dtos.PageableDto;
+import br.com.compass.ecommerce_api.dtos.TotalAmountReportDto;
+import br.com.compass.ecommerce_api.dtos.TotalPurchasesReportDto;
 import br.com.compass.ecommerce_api.dtos.mappers.PageableMapper;
+import br.com.compass.ecommerce_api.dtos.mappers.ReportsMapper;
 import br.com.compass.ecommerce_api.projections.TopBuyerProjection;
 import br.com.compass.ecommerce_api.services.PurchaseService;
 import lombok.RequiredArgsConstructor;
@@ -29,20 +32,20 @@ public class PurchaseController {
 
     @GetMapping("/total-amount")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<BigDecimal> getTotalAmount(@RequestParam String period) {
+    public ResponseEntity<TotalAmountReportDto> getTotalAmount(@RequestParam String period) {
         BigDecimal totalAmount = purchaseService.getTotalAmount(period);
-        return ResponseEntity.ok(totalAmount);
+        return ResponseEntity.ok(ReportsMapper.toTotalAmountDto(period, totalAmount));
     }
 
     @GetMapping("/total-purchases")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Integer> getTotalPurchases(@RequestParam String period) {
+    public ResponseEntity<TotalPurchasesReportDto> getTotalPurchases(@RequestParam String period) {
         Integer totalPurchases = purchaseService.getTotalPurchases(period);
-        return ResponseEntity.ok(totalPurchases);
+        return ResponseEntity.ok(ReportsMapper.toTotalPurchasesDto(period, totalPurchases));
     }
 
     @PostMapping("/perform-purchase/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT') AND #dto.email == authentication.principal.username")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT') AND #id == authentication.principal.id")
     public ResponseEntity<Void> performPurchase(@PathVariable Long id) {
         purchaseService.performPurchase(id);
         return ResponseEntity.ok().build();

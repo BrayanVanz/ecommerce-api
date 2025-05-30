@@ -80,8 +80,7 @@ public class PurchaseService {
 
     @Transactional
     public void performPurchase(Long id) {
-        User user = userService.findById(id);
-        List<CartItem> cart = user.getCart();
+        List<CartItem> cart = cartItemService.findByUserId(id);
 
         if (cart.isEmpty()) {
             throw new CartEmptyException("Cart is currently empty");
@@ -98,6 +97,9 @@ public class PurchaseService {
             .map(item -> item.getProduct().getAmount().multiply(BigDecimal.valueOf(item.getQuantity())))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
         
+
+        User user = userService.findById(id);
+
         Purchase purchase = new Purchase();
         purchase.setUser(user);
         purchase.setTotalAmount(totalAmount);
